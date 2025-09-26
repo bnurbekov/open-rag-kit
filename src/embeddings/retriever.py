@@ -1,23 +1,41 @@
 import os
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
 
-from src.ingestion import PDFIngestor, ImageIngestor, AudioIngestor
+from ingestion import PDFIngestor, ImageIngestor, AudioIngestor
 
 class MultiModalRetriever:
     def __init__(self, vectorstore_path="vectorstore/faiss_index"):
-        self.embeddings = OpenAIEmbeddings()
+        self.embeddings = None  # Initialize lazily
         self.vectorstore_path = vectorstore_path
-
-        if os.path.exists(vectorstore_path):
-            self.vstore = FAISS.load_local(vectorstore_path, self.embeddings)
-        else:
-            self.vstore = None
+        self.vstore = None
 
         # Ingestors
         self.pdf_ingestor = PDFIngestor()
         self.image_ingestor = ImageIngestor()
         self.audio_ingestor = AudioIngestor()
+        
+        # Load existing vectorstore if it exists
+        self._load_existing_vectorstore()
+
+    def _get_embeddings(self):
+        """Lazy initialization of embeddings"""
+        if self.embeddings is None:
+            self.embeddings = OpenAIEmbeddings()
+        return self.embeddings
+
+    def _load_existing_vectorstore(self):
+        """Load existing vectorstore if it exists"""
+        if os.path.exists(self.vectorstore_path):
+            try:
+                self.vstore = FAISS.load_local(
+                    self.vectorstore_path, 
+                    self._get_embeddings(), 
+                    allow_dangerous_deserialization=True
+                )
+            except Exception as e:
+                print(f"Warning: Could not load existing vectorstore: {e}")
+                self.vstore = None
 
     def add_file(self, file_path: str):
         ext = os.path.splitext(file_path)[1].lower()
@@ -42,7 +60,7 @@ class MultiModalRetriever:
         metadatas = [d["metadata"] for d in docs]
 
         if self.vstore is None:
-            self.vstore = FAISS.from_texts(texts, self.embeddings, metadatas=metadatas)
+            self.vstore = FAISS.from_texts(texts, self._get_embeddings(), metadatas=metadatas)
         else:
             self.vstore.add_texts(texts, metadatas=metadatas)
 
