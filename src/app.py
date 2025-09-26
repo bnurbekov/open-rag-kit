@@ -2,11 +2,11 @@
 import streamlit as st
 from langchain.schema import Document
 
-from src.loaders import load_pdf, load_txt, load_md, load_csv
-from src.chains.rag_chain import build_rag_chain
-from src.embeddings.retriever import build_vectorstore
-from src.evaluation import evaluate_retrieval
-from src.agent import build_agent
+from loaders import load_pdf, load_txt, load_md, load_csv
+from chains.rag_chain import build_rag_chain
+from embeddings.retriever import build_vectorstore
+from evaluation import evaluate_retrieval
+from agent import build_agent
 
 
 st.set_page_config(page_title="📚 Advanced RAG App", layout="wide")
@@ -63,7 +63,7 @@ st.sidebar.header("Evaluation")
 query = st.sidebar.text_input("Test query")
 ground_truth = st.sidebar.text_input("Expected answer keyword")
 if st.sidebar.button("Evaluate") and query and ground_truth and docs:
-    from src.embeddings.retriever import get_retriever
+    from embeddings.retriever import get_retriever
     retriever = get_retriever(docs, "rag_index", k=top_k)
     results = retriever.get_relevant_documents(query)
     metrics = evaluate_retrieval(query, results, ground_truth)

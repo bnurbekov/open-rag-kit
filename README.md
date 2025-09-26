@@ -29,7 +29,8 @@ Chat with your own PDF in 3 steps:
 git clone https://github.com/your-username/open-rag-template.git
 cd open-rag-template
 pip install -r requirements.txt
-python src/app.py
+export OPENAI_API_KEY="your-api-key-here"
+streamlit run src/app.py
 
 
 Then open http://localhost:8501
@@ -81,15 +82,18 @@ cd open-rag-template
 # Install dependencies
 pip install -r requirements.txt
 
+# Set your OpenAI API key
+export OPENAI_API_KEY="your-api-key-here"
+
 # Run app
-python src/app.py
+streamlit run src/app.py
 
 ⚡ Usage
 Ingest documents
 python src/ingest/pdf_loader.py data/my_docs/
 
 Run chatbot
-python src/app.py
+streamlit run src/app.py
 
 Agent mode (SQL + tools)
 

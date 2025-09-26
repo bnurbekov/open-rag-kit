@@ -1,10 +1,10 @@
 from typing import List
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.schema import Document
 
-from src.prompts.rag_prompt import rag_prompt
-from src.embeddings.retriever import get_retriever
+from prompts.rag_prompt import rag_prompt
+from embeddings.retriever import get_retriever
 
 
 def build_rag_chain(docs: List[Document], model_name: str = "gpt-4o-mini", k: int = 3):

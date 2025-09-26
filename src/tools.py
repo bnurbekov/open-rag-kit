@@ -1,7 +1,7 @@
 from langchain.tools import Tool
 from langchain.schema import Document
-from src.embeddings.retriever import get_retriever
-from src.chains.rag_chain import build_rag_chain
+from embeddings.retriever import get_retriever
+from chains.rag_chain import build_rag_chain
 
 
 def make_rag_tools(docs: list[Document], model_name: str = "gpt-4o-mini", k: int = 3):

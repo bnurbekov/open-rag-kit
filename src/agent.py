@@ -1,6 +1,6 @@
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.agents import initialize_agent, AgentType
-from src.tools import make_rag_tools
+from tools import make_rag_tools
 from langchain.schema import Document
 
 

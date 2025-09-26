@@ -3,7 +3,7 @@
 import os
 from typing import List
 from langchain.schema import Document
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 CACHE_DIR = "vectorstores"
