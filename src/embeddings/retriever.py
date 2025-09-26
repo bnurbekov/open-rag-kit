@@ -1,25 +1,55 @@
-# src/embeddings/retriever.py
-
 import os
-from typing import List
-from langchain.schema import Document
-from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.embeddings import OpenAIEmbeddings
 
-CACHE_DIR = "vectorstores"
+from src.ingestion import PDFIngestor, ImageIngestor, AudioIngestor
 
-def build_vectorstore(docs: List[Document], index_name: str = "rag_index") -> FAISS:
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    path = os.path.join(CACHE_DIR, index_name)
+class MultiModalRetriever:
+    def __init__(self, vectorstore_path="vectorstore/faiss_index"):
+        self.embeddings = OpenAIEmbeddings()
+        self.vectorstore_path = vectorstore_path
 
-    if os.path.exists(path):
-        return FAISS.load_local(path, OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+        if os.path.exists(vectorstore_path):
+            self.vstore = FAISS.load_local(vectorstore_path, self.embeddings)
+        else:
+            self.vstore = None
 
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(docs, embeddings)
-    vectorstore.save_local(path)
-    return vectorstore
+        # Ingestors
+        self.pdf_ingestor = PDFIngestor()
+        self.image_ingestor = ImageIngestor()
+        self.audio_ingestor = AudioIngestor()
 
-def get_retriever(docs: List[Document], index_name: str = "rag_index", k: int = 3):
-    vectorstore = build_vectorstore(docs, index_name=index_name)
-    return vectorstore.as_retriever(search_kwargs={"k": k})
+    def add_file(self, file_path: str):
+        ext = os.path.splitext(file_path)[1].lower()
+        docs = []
+
+        if ext in [".pdf"]:
+            chunks = self.pdf_ingestor.process(file_path)
+            docs = [{"text": c, "metadata": {"source": file_path}} for c in chunks]
+
+        elif ext in [".png", ".jpg", ".jpeg"]:
+            caption = self.image_ingestor.process(file_path)
+            docs = [{"text": caption, "metadata": {"source": file_path}}]
+
+        elif ext in [".mp3", ".wav", ".m4a"]:
+            transcript = self.audio_ingestor.process(file_path)
+            docs = [{"text": transcript, "metadata": {"source": file_path}}]
+
+        else:
+            raise ValueError(f"Unsupported file type: {ext}")
+
+        texts = [d["text"] for d in docs]
+        metadatas = [d["metadata"] for d in docs]
+
+        if self.vstore is None:
+            self.vstore = FAISS.from_texts(texts, self.embeddings, metadatas=metadatas)
+        else:
+            self.vstore.add_texts(texts, metadatas=metadatas)
+
+        # Save vectorstore after adding
+        self.vstore.save_local(self.vectorstore_path)
+
+    def retrieve(self, query: str, k=3):
+        if not self.vstore:
+            raise RuntimeError("Vectorstore is empty. Add files first.")
+        return self.vstore.similarity_search(query, k=k)

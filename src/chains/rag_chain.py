@@ -4,11 +4,10 @@ from langchain.chains import LLMChain
 from langchain.schema import Document
 
 from prompts.rag_prompt import rag_prompt
-from embeddings.retriever import get_retriever
+from embeddings.retriever import MultiModalRetriever
 
 
-def build_rag_chain(docs: List[Document], model_name: str = "gpt-4o-mini", k: int = 3):
-    retriever = get_retriever(docs, index_name="rag_index", k=k)
+def build_rag_chain(retriever: MultiModalRetriever, model_name: str = "gpt-4o-mini", k: int = 3):
     llm = ChatOpenAI(model=model_name, temperature=0)
 
     rag_chain = LLMChain(
@@ -18,7 +17,7 @@ def build_rag_chain(docs: List[Document], model_name: str = "gpt-4o-mini", k: in
     )
 
     def run(question: str) -> str:
-        results = retriever.get_relevant_documents(question)
+        results = retriever.retrieve(question, k=k)
         context = "\n\n".join([doc.page_content for doc in results])
         answer = rag_chain.run({"context": context, "question": question})
 
