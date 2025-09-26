@@ -1,11 +1,12 @@
-📚 Open RAG Template
+# 📚 Open RAG Template
 
 Open RAG Template is a plug-and-play Retrieval-Augmented Generation (RAG) framework built with LangChain. It lets you instantly chat with your own documents (PDF, Markdown, CSV, text, etc.) — while showcasing best practices in prompt engineering, retrieval design, agents, evaluation, and fine-tuning.
 
-⚡️ Why this project?
+## ⚡️ Why this project?
+
 Most RAG tutorials are toy-level. This repo gives you a production-ready, modular, open-source template you can actually use, extend, and learn from.
 
-✨ Features
+## ✨ Features
 
 📂 Multi-format ingestion → PDF, Markdown, TXT, CSV loaders out of the box.
 
@@ -21,8 +22,11 @@ Most RAG tutorials are toy-level. This repo gives you a production-ready, modula
 
 🚀 Deploy anywhere → Run locally (Docker, pip) or in the cloud (AWS/GCP).
 
-🖼️ Demo
+## 🖼️ Demo
+
 <p align="center"> <img src="docs/demo.gif" width="600" alt="Demo: Chat with your docs" /> </p>
+
+### Quick Start
 
 Chat with your own PDF in 3 steps:
 
@@ -36,22 +40,18 @@ streamlit run src/app.py
 Then open http://localhost:8501
  🎉
 
-🏗️ Architecture
+## 🏗️ Architecture
+
 <p align="center"> <img src="docs/architecture.png" width="650" alt="Architecture diagram" /> </p>
 
-Ingest documents → chunk + embed into FAISS (or another DB).
+1. Ingest documents → chunk + embed into FAISS (or another DB).
+2. Retrieve relevant chunks per query.
+3. Construct prompt with query + context.
+4. Generate answer with an LLM (OpenAI, Anthropic, Llama 3, etc.).
+5. (Optional) Agent → use tools like SQL or web search if needed.
+6. Evaluate outputs with metrics + logs.
 
-Retrieve relevant chunks per query.
-
-Construct prompt with query + context.
-
-Generate answer with an LLM (OpenAI, Anthropic, Llama 3, etc.).
-
-(Optional) Agent → use tools like SQL or web search if needed.
-
-Evaluate outputs with metrics + logs.
-
-📂 Project Structure
+## 📂 Project Structure
 open-rag-template/
 ├── src/
 │   ├── ingest/         # PDF/Markdown/CSV loaders
@@ -65,16 +65,15 @@ open-rag-template/
 ├── tests/              # Unit tests
 └── docs/               # Docs + diagrams + demo GIF
 
-🛠️ Installation
-Requirements
+## 🛠️ Installation
 
-Python 3.9+
+### Requirements
 
-pip install -r requirements.txt
+- Python 3.9+
+- `pip install -r requirements.txt`
+- (Optional) Docker + docker-compose
 
-(Optional) Docker + docker-compose
-
-Setup
+### Setup
 # Clone repo
 git clone https://github.com/your-username/open-rag-template.git
 cd open-rag-template
@@ -88,35 +87,39 @@ export OPENAI_API_KEY="your-api-key-here"
 # Run app
 streamlit run src/app.py
 
-⚡ Usage
-Ingest documents
+## ⚡ Usage
+
+### Ingest documents
+```bash
 python src/ingest/pdf_loader.py data/my_docs/
+```
 
-Run chatbot
+### Run chatbot
+```bash
 streamlit run src/app.py
+```
 
-Agent mode (SQL + tools)
+### Agent mode (SQL + tools)
 
 Enable in config.py:
-
+```python
 ENABLE_AGENT_MODE = True
+```
 
-🧪 Evaluation
+## 🧪 Evaluation
 
-Run test suite:
-
+### Run test suite:
+```bash
 python src/eval/evaluator.py
+```
 
+### Metrics included:
 
-Metrics included:
+- Embedding similarity (semantic closeness).
+- LLM-as-judge scoring (quality, groundedness, helpfulness).
+- Custom test cases via eval/test_cases.json.
 
-Embedding similarity (semantic closeness).
-
-LLM-as-judge scoring (quality, groundedness, helpfulness).
-
-Custom test cases via eval/test_cases.json.
-
-🌱 Roadmap
+## 🌱 Roadmap
 
 ✅ Phase 1: Core RAG chatbot
 
@@ -128,24 +131,21 @@ Custom test cases via eval/test_cases.json.
 
 🔲 Phase 5: Fine-tuning (LoRA, instruction datasets)
 
-🤝 Contributing
+## 🤝 Contributing
 
 Contributions welcome! Open issues, suggest features, or submit PRs.
 
-📜 License
+## 📜 License
 
 MIT License — free to use, modify, and share.
 
-⭐ Why Star This Repo?
+## ⭐ Why Star This Repo?
 
 If you find this useful, give it a ⭐ on GitHub! It helps others discover the project and keeps development going.
 
-🔥 With this README, anyone can:
+## 🔥 With this README, anyone can:
 
-Understand what the project does.
-
-Install + run it in minutes.
-
-See that it’s modular and professional.
-
-Know there’s a roadmap for growth.
+- Understand what the project does.
+- Install + run it in minutes.
+- See that it's modular and professional.
+- Know there's a roadmap for growth.
